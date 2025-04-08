@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Article>
+﻿@model ArticleListViewModel
 
 @{
     ViewData["Title"] = "Blogs";
@@ -6,11 +6,20 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>My Personal Blogging App</p>
     <a asp-action="Create">Create new article</a>
 
+    <form asp-action="Index" method="get" class="form-parent" style="max-width: 20vw; margin-left: auto; margin-right: auto; margin-top: 1rem;">
+        <div class="form-group">
+            <label asp-for="Search" class="control-label">Title</label>
+            <input asp-for="Search" class="form-control" />
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Search" class="btn btn-primary" />
+        </div>
+    </form>
+
     <div class="articles-container">
-        @foreach (var article in Model)
+        @foreach (var article in Model.Articles!)
         {
             <div class="article-container">
                 <a asp-action="Details" asp-route-id="@article.Id">@article.Title</a>

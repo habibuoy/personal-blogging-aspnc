@@ -26,9 +26,22 @@ public class HomeController : Controller
     }
     
     [HttpGet("index")]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? search)
     {
-        return View(await context.Articles.ToListAsync());
+        var articles = from article in context.Articles select article;
+
+        if (!string.IsNullOrEmpty(search))
+        {
+            articles = articles.Where(article => article.Title.ToUpper().Contains(search.ToUpper()));
+        }
+
+        var result = new ArticleListViewModel()
+        {
+            Articles = await articles.ToListAsync(),
+            Search = search
+        };
+
+        return View(result);
     }
 
     [HttpGet("create")]
