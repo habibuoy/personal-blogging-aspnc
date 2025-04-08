@@ -9,6 +9,7 @@ string dbConnection = builder.Configuration.GetConnectionString("MainDb")!;
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(dbConnection);
+    options.EnableSensitiveDataLogging();
 });
 
 var app = builder.Build();
