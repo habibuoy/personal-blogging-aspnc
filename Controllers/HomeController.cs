@@ -26,19 +26,30 @@ public class HomeController : Controller
     }
     
     [HttpGet("index")]
-    public async Task<IActionResult> Index(string? search)
+    public async Task<IActionResult> Index(string? search, string[]? tags)
     {
         var articles = from article in context.Articles select article;
+        var tagsArray = articles.SelectMany(article => article.Tags!);
 
         if (!string.IsNullOrEmpty(search))
         {
             articles = articles.Where(article => article.Title.ToUpper().Contains(search.ToUpper()));
         }
 
+        if (tags != null 
+            && tags.Length > 1
+            || (tags!.Length == 1
+                && tags[0] != "None"))
+        {
+            articles = articles.Where(article => article.Tags!.Intersect(tags).Count() > 0);
+        }
+
         var result = new ArticleListViewModel()
         {
             Articles = await articles.ToListAsync(),
-            Search = search
+            Search = search,
+            TagsOptions = new(await tagsArray.Distinct().ToListAsync()),
+            Tags = tags
         };
 
         return View(result);
