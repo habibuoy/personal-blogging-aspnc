@@ -8,4 +8,8 @@ public class ArticleListViewModel
     public List<Article>? Articles { get; set; }
     public SelectList? TagsOptions { get; set; }
     public string[]? Tags { get; set; }
+    public SelectList? SortByOptions { get; set; }
+    public SelectList? SortOrderOptions { get; set; }
+    public string? SortBy { get; set; }
+    public string? SortOrder { get; set; }
 }

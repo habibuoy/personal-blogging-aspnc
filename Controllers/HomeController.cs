@@ -1,5 +1,6 @@
 using System.Data;
 using System.Diagnostics;
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PersonalBlogging.Data;
@@ -12,6 +13,16 @@ public class HomeController : Controller
 {
     private readonly ILogger<HomeController> logger;
     private readonly ApplicationDbContext context;
+
+    private static readonly string[] SortByOptions = {"Title", "Published Date", "Last Update"};
+    private static readonly string[] SortOrderOptions = {"Asc", "Desc"};
+
+    private static readonly Dictionary<string, Expression<Func<Article, object>>> SorterExpressions = new()
+    {
+        { SortByOptions[0], article => article.Title},
+        { SortByOptions[1], article => article.PublishedDate!},
+        { SortByOptions[2], article => article.LastModifiedDate!},
+    };
 
     public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
     {
@@ -26,7 +37,7 @@ public class HomeController : Controller
     }
     
     [HttpGet("index")]
-    public async Task<IActionResult> Index(string? search, string[]? tags)
+    public async Task<IActionResult> Index(string? search, string[]? tags, string? sortBy, string? sortOrder)
     {
         var articles = from article in context.Articles select article;
         var tagsArray = articles.SelectMany(article => article.Tags!);
@@ -44,12 +55,30 @@ public class HomeController : Controller
             articles = articles.Where(article => article.Tags!.Intersect(tags).Count() > 0);
         }
 
+        if (!string.IsNullOrEmpty(sortBy)
+            && SorterExpressions.TryGetValue(sortBy, out var sorter))
+        {
+            if (string.IsNullOrEmpty(sortOrder)
+                || sortOrder.Equals(SortOrderOptions[0]))
+            {
+                articles = articles.OrderBy(sorter);
+            }
+            else
+            {
+                articles = articles.OrderByDescending(sorter);
+            }
+        }
+
         var result = new ArticleListViewModel()
         {
             Articles = await articles.ToListAsync(),
             Search = search,
             TagsOptions = new(await tagsArray.Distinct().ToListAsync()),
-            Tags = tags
+            Tags = tags,
+            SortByOptions = new(SortByOptions),
+            SortBy = sortBy,
+            SortOrderOptions = new(SortOrderOptions),
+            SortOrder = sortOrder,
         };
 
         return View(result);

@@ -8,7 +8,7 @@ public class Article
     public int Id { get; set; }
     [DisplayName("Published Date")]
     public DateTime? PublishedDate { get; set; }
-    [DisplayName("Last Modified Date")]
+    [DisplayName("Last Update")]
     public DateTime? LastModifiedDate { get; set; }
     public string Title { get; set; }
     [DisplayName("Author Name")]
