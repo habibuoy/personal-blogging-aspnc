@@ -1,0 +1,16 @@
+@model Article
+
+<div class="tags-input">
+    <div class="title">
+        <i class="bi bi-tag" style="font-size: 20px;"></i>
+        <h2>Tags</h2>
+    </div>
+    <div class="content">
+        <ul id="tags-list"><input type="text" spellcheck="false" id="tags-input"></ul>
+        <span class="form-text" id="tags-input-guide">Press enter or comma after each tag<span id="tags-input-count">(n tags remaining)</span> </span>
+    </div>
+    <div class="details" id="tags-input-details">
+        <button type="button">Remove All</button>
+    </div>
+    <input asp-for="TagsString" type="hidden" id="tags-hidden"/>
+</div>

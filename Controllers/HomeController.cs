@@ -11,6 +11,8 @@ namespace PersonalBlogging.Controllers;
 [Route("")]
 public class HomeController : Controller
 {
+    private const int MaximumTagCount = 5;
+
     private readonly ILogger<HomeController> logger;
     private readonly ApplicationDbContext context;
 
@@ -87,7 +89,7 @@ public class HomeController : Controller
     [HttpGet("create")]
     public IActionResult Create()
     {
-        return View();
+        return View(new Article());
     }
 
     [HttpPost("create")]
@@ -98,6 +100,7 @@ public class HomeController : Controller
             try
             {
                 article.PublishedDate = article.LastModifiedDate = DateTime.Now;
+                article.EnsureMaximumTagsCount(MaximumTagCount);
                 context.Add(article);
                 await context.SaveChangesAsync();
             }
@@ -108,7 +111,8 @@ public class HomeController : Controller
             }
             return RedirectToAction(nameof(Index));
         }
-        return View();
+
+        return View(article);
     }
 
     [HttpGet("details/{id}")]
@@ -177,6 +181,8 @@ public class HomeController : Controller
                 existing!.Content = article.Content;
                 existing!.Tags = article.Tags;
                 existing!.LastModifiedDate = DateTime.Now;
+
+                existing.EnsureMaximumTagsCount(MaximumTagCount);
 
                 await context.SaveChangesAsync();
             }

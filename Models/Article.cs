@@ -10,9 +10,9 @@ public class Article
     public DateTime? PublishedDate { get; set; }
     [DisplayName("Last Update")]
     public DateTime? LastModifiedDate { get; set; }
-    public string Title { get; set; }
+    public string Title { get; set; } = string.Empty;
     [DisplayName("Author Name")]
-    public string AuthorName { get; set; }
+    public string AuthorName { get; set; } = string.Empty;
     public string? Content { get; set; }
     public string[]? Tags { get; set; }
 
@@ -27,6 +27,17 @@ public class Article
         set
         {
             Tags = value?.Split(",").Select(tag => tag.Trim()).ToArray();
+        }
+    }
+
+    public void EnsureMaximumTagsCount(int count)
+    {
+        if (Tags != null
+            && Tags.Length > count)
+        {
+            var tags = Tags;
+            Array.Resize(ref tags, count);
+            Tags = tags;
         }
     }
 }
