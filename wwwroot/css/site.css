@@ -1,0 +1,156 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+
+.form-parent {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  row-gap: 8px;
+  flex-wrap: wrap;
+}
+
+.articles-container {
+  display: block;
+  width: 60vw;
+  margin-top: 2rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.article-container {
+  margin-top: 1rem;
+}
+
+.input-field-item {
+  background: #fff;
+  border-radius: 10px;
+  padding: 18px 25px 20px;
+  box-shadow: 0 0 30px rgba(0,0,0,0.06);
+}
+
+.input-field-item label {
+  font-size: 1em;
+  font-weight: bold;
+}
+
+.input-field-item.submit {
+  display: flex;
+  justify-content: center;
+  column-gap: 8px;
+  padding: 8px 8px;
+  margin-left: auto;
+}
+
+/* Region Tags Input */
+::selection {
+  color: #fff;
+  background: #5372F0;
+}
+
+.tags-input :disabled {
+  background: #fff;
+}
+
+.tags-input :where(.title, li, li i, .details) {
+  display: flex;
+  align-items: center;
+}
+
+.tags-input .title h2 {
+  font-size: 21px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.tags-input .tags-input .content {
+  margin: 10px 0;
+}
+
+.tags-input .content ul {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 7px;
+  margin: 0;
+  border-radius: 5px;
+  border: 1px solid #a6a6a6;
+}
+
+.tags-input .content ul li {
+  color: #333;
+  margin: 4px 3px;
+  list-style: none;
+  border-radius: 5px;
+  background: #F2F2F2;
+  padding: 5px 8px 5px 10px;
+  border: 1px solid #e3e1e1;
+}
+
+.tags-input .content ul li i {
+  height: 20px;
+  width: 20px;
+  color: #808080;
+  margin-left: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 50%;
+  background: #dfdfdf;
+  justify-content: center;
+}
+
+.tags-input .content ul input {
+  flex: 1;
+  padding: 5px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+}
+
+.tags-input .details {
+  justify-content: space-between;
+}
+
+.tags-input .details button {
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 9px 15px;
+  border-radius: 5px;
+  background: #5372F0;
+  transition: background 0.3s ease;
+  margin-left: auto;
+}
+
+.tags-input .details button:hover {
+  background: #2c52ed;
+}
