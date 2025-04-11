@@ -4,39 +4,43 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
-
-<h4>Article</h4>
-<hr />
-<div class="row d-block">
-    <div class="col-md-4">
+<div class="row">
+    <div class="col" style="max-width: 60%; margin: auto;">
+    <h1>Create</h1>
+    <h4>New Article</h4>
+        <hr />
         <form asp-action="Create" class="form-parent">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="AuthorName" class="control-label"></label>
-                <input asp-for="AuthorName" class="form-control" />
-                <span asp-validation-for="AuthorName" class="text-danger"></span>
+                <div class="input-field-item">
+                    <label asp-for="AuthorName" class="control-label"></label>
+                    <input asp-for="AuthorName" class="form-control" />
+                    <span asp-validation-for="AuthorName" class="text-danger"></span>
+                </div>
             </div>
             <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+                <div class="input-field-item">
+                    <label asp-for="Title" class="control-label"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
             </div>
             <div class="form-group">
-                <label asp-for="Content" class="control-label"></label>
-                <textarea asp-for="Content" class="form-control" class="flex-1"></textarea> </textarea>
-                <span asp-validation-for="Content" class="text-danger"></span>
+                <div class="input-field-item">
+                    <label asp-for="Content" class="control-label"></label>
+                    <textarea asp-for="Content" class="form-control" class="flex-1"></textarea> </textarea>
+                    <span asp-validation-for="Content" class="text-danger"></span>
+                </div>
             </div>
             <div class="form-group">
                 @await Html.PartialAsync("_TagsInput", Model, ViewData)
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <div class="input-field-item submit">
+                    <input type="submit" value="Create" class="btn btn-primary"/>
+                    <a asp-action="Index" class="btn btn-secondary"/>Back To List</a>
+                </div>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="">Back to List</a>
 </div>

@@ -1,9 +1,9 @@
 @model Article
 
-<div class="tags-input">
+<div class="input-field-item tags-input">
     <div class="title">
-        <i class="bi bi-tag" style="font-size: 20px;"></i>
-        <h2>Tags</h2>
+        <i class="bi bi-tag" style="font-size: 1em;"></i>
+        <label asp-for="Tags" class="control-label"></label>
     </div>
     <div class="content">
         <ul id="tags-list"><input type="text" spellcheck="false" id="tags-input"></ul>
