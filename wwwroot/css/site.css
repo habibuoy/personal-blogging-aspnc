@@ -50,6 +50,30 @@ body {
   margin-top: 1rem;
 }
 
+.article-details-container {
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px 16px 16px;
+  box-shadow: 0 0 30px rgba(0,0,0,0.06);
+}
+
+.article-details-container .article-dates {
+  display: flex;
+  flex-grow: 1;
+  justify-content: space-between;
+  margin: 0 2;
+}
+
+.article-details-container .article-dates p {
+  font-weight: 500;
+}
+
+.article-details-container .buttons {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
 .input-field-item {
   background: #fff;
   border-radius: 10px;
@@ -70,6 +94,34 @@ body {
   margin-left: auto;
 }
 
+.article-tags .title {
+  display: flex;
+  flex-grow: 1;
+  flex-wrap: wrap;
+}
+
+.article-tags #tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  color: #333;
+  list-style: none;
+  border-radius: 4px;
+  background: #F2F2F2;
+  padding: 5px 8px 5px 10px;
+  border: 1px solid #e3e1e1;
+}
+
+.article-tags #tags-item {
+  display: flex;
+  color: #333;
+  margin: 4px 3px;
+  list-style: none;
+  border-radius: 5px;
+  background: #fff;
+  padding: 5px 8px 5px 10px;
+  border: 1px solid #e3e1e1;
+}
+
 /* Region Tags Input */
 ::selection {
   color: #fff;
@@ -85,13 +137,7 @@ body {
   align-items: center;
 }
 
-.tags-input .title h2 {
-  font-size: 21px;
-  font-weight: 600;
-  margin-left: 8px;
-}
-
-.tags-input .tags-input .content {
+.tags-input .content {
   margin: 10px 0;
 }
 

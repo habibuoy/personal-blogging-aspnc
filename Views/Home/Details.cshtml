@@ -5,54 +5,41 @@
     var articleTitle = string.IsNullOrEmpty(Model.Title) ? "Article" : $"Article - {Model.Title}";
 }
 
-<h1>Details</h1>
 
-<div>
-    <h4>@(articleTitle)</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PublishedDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PublishedDate)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LastModifiedDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LastModifiedDate)
-        </dd>
-    </dl>
-    <dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AuthorName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AuthorName)
-        </dd>
-    </dl>
-    <dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Content)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Content)
-        </dd>
-    </dl>
-    <dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Tags)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TagsString)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Delete" asp-route-id="@Model?.Id">Delete</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="row">
+    <div class="col" style="max-width: 60%; margin: auto;">
+        <h1>Details</h1>
+        <h4>@(articleTitle)</h4>
+        <hr />
+        <div class="article-details-container">
+            <div class="article-dates">
+                <p class="m-0">Published on @Model.PublishedDate</p>
+                <p class="m-0">|</p>
+                <p class="m-0">Last Updated on @Model.LastModifiedDate</p>
+            </div>
+            <h6 class="m-0">Written by @Model.AuthorName</h6>
+            <hr class="ml-0 mr-0 mt-3 mb-4"/>
+            <p>@Model.Content</p>
+            <hr class="ml-0 mr-0 mt-4 mb-4"/>
+            <div class="article-tags">
+                <div class="title">
+                    <i class="bi bi-tag"></i>
+                    <h6>@Html.DisplayNameFor(model => model.Tags)</h6>
+                </div>
+                <div class="tags">
+                    <ul id="tags-list">
+                        @foreach (var tag in Model.Tags!)
+                        {
+                            <li id="tags-item">@tag</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="buttons">
+                <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Edit</a>
+                <a asp-action="Delete" asp-route-id="@Model?.Id" class="btn btn-danger">Delete</a>
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </div>
+    </div>
 </div>
