@@ -199,27 +199,8 @@ public class HomeController : Controller
         return View(article);
     }
 
-    [HttpGet("delete/{id}")]
-    public async Task<IActionResult> Delete(int? id)
-    {
-        if (id == null)
-        {
-            return BadRequest();
-        }
-
-        var article = await context.Articles.FindAsync(id);
-
-        if (article == null)
-        {
-            logger.LogInformation($"{nameof(Edit)}: Article id {id} not found");
-            return NotFound();
-        }
-
-        return View(article);
-    }
-
     [HttpPost("delete/{id}")]
-    public async Task<IActionResult> ConfirmDelete(int? id)
+    public async Task<IActionResult> Delete(int? id)
     {
         if (id == null)
         {
