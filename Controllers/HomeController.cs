@@ -12,6 +12,7 @@ namespace PersonalBlogging.Controllers;
 public class HomeController : Controller
 {
     private const int MaximumTagCount = 5;
+    private const string NoneTags = "None";
 
     private readonly ILogger<HomeController> logger;
     private readonly ApplicationDbContext context;
@@ -52,9 +53,14 @@ public class HomeController : Controller
         if (tags != null 
             && tags.Length > 1
             || (tags!.Length == 1
-                && tags[0] != "None"))
+                && tags[0] != NoneTags))
         {
             articles = articles.Where(article => article.Tags!.Intersect(tags).Count() > 0);
+        }
+        else if (tags != null
+                 && tags.Length == 0)
+        {
+            tags = [NoneTags];
         }
 
         if (!string.IsNullOrEmpty(sortBy)
@@ -71,11 +77,14 @@ public class HomeController : Controller
             }
         }
 
+        var tagsList = await tagsArray.Distinct().ToListAsync();
+        tagsList.Insert(0, NoneTags);
+
         var result = new ArticleListViewModel()
         {
             Articles = await articles.ToListAsync(),
             Search = search,
-            TagsOptions = new(await tagsArray.Distinct().ToListAsync()),
+            TagsOptions = new(tagsList),
             Tags = tags,
             SortByOptions = new(SortByOptions),
             SortBy = sortBy,

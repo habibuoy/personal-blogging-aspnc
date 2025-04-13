@@ -2,40 +2,102 @@
 
 @{
     ViewData["Title"] = "Home";
+    const int ContentMaxShownCharacterCount = 300;
+    const string DisabledArticleDetailLinkStyle = "pointer-events: none;";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <a asp-action="Create">Create new article</a>
+<div class="container" style="max-width: 50vw;">
+    <div class="text-center mb-4">
+        <h1 class="display-4">Welcome</h1>
+        <a asp-action="Create" class="btn btn-primary d-inline-flex align-items-center gap-2 my-3">
+            <i class="bi bi-plus-circle"></i> Create New Article
+        </a>
+    </div>
 
-    <form asp-action="Index" method="get" class="form-parent" style="max-width: 20vw; margin-left: auto; margin-right: auto; margin-top: 1rem;">
-        <div class="form-group">
-            <label asp-for="Search" class="control-label">Title</label>
-            <input asp-for="Search" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label class="control-label">Tag</label>
-            <select asp-for="Tags" asp-items="Model.TagsOptions" style="width: 100%;">
-                <option value="None">None</option>
-            </select>
-        </div>
-        <div class="form-group d-flex gap-2">
-            <label class="control-label">Sort</label>
-            <select asp-for="SortBy" asp-items="Model.SortByOptions" style="width: 50%;">
-            </select>
-            <select asp-for="SortOrder" asp-items="Model.SortOrderOptions" style="width: 50%;">
-            </select>
-        </div>
-        <div class="form-group">
-            <input type="submit" value="Search" class="btn btn-primary" />
-        </div>
-    </form>
+    <div class="card shadow-sm p-4 mb-4">
+        <form asp-action="Index" method="get" class="row g-3 justify-content-center">
+            <div class="col-12 col-md-6 col-lg-4">
+                <label asp-for="Search" class="form-label">Title</label>
+                <input asp-for="Search" class="form-control form-control-lg shadow-sm" placeholder="Search by title..." />
+            </div>
 
-    <div class="articles-container">
+            <div class="col-12 col-md-6 col-lg-4">
+                <label class="form-label">Tags (multiselect hold CTRL)</label>
+                <select asp-for="Tags" asp-items="Model.TagsOptions" multiple class="form-select shadow-sm">
+                    
+                </select>
+            </div>
+
+            <div class="col-6 col-lg-2">
+                <label class="form-label">Sort By</label>
+                <select asp-for="SortBy" asp-items="Model.SortByOptions" class="form-select shadow-sm"></select>
+            </div>
+
+            <div class="col-6 col-lg-2">
+                <label class="form-label">Order</label>
+                <select asp-for="SortOrder" asp-items="Model.SortOrderOptions" class="form-select shadow-sm"></select>
+            </div>
+
+            <div class="col-12">
+                <button type="submit" class="btn btn-success w-100">
+                    <i class="bi bi-search"></i> Search
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <hr />
+
+    <div class="articles-container row g-4">
         @foreach (var article in Model.Articles!)
         {
-            <div class="article-container">
-                <a asp-action="Details" asp-route-id="@article.Id">@article.Title</a>
+            bool isEmptyContent = article.Content == null || article.Content.Length == 0;
+            bool isLongContent = !isEmptyContent && article.Content.Length > ContentMaxShownCharacterCount;
+            var content = isEmptyContent ? "No Content" : isLongContent
+                ? article.Content.Substring(0, ContentMaxShownCharacterCount) + "..." : article.Content;
+            var contentStyle = isEmptyContent ? "empty" : string.Empty;
+
+            <div class="col-12">
+                <div class="card mb-3 shadow-sm h-100">
+                    <a asp-action="Details" asp-route-id="@article.Id" style="@(isLongContent ? string.Empty : DisabledArticleDetailLinkStyle)" class="disabled text-decoration-none text-dark">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between flex-wrap align-items-center mb-2">
+                                <div>
+                                    <p class="h5 mb-1">@article.Title</p>
+                                    <p class="text-muted mb-0">Written by @article.AuthorName</p>
+                                </div>
+                                <div class="d-flex gap-3">
+                                    <div class="text-center">
+                                        <i class="bi bi-newspaper"></i><br />
+                                        <div class="small">@article.PublishedDate</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <i class="bi bi-clock"></i><br />
+                                        <div class="small">@article.LastModifiedDate</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                            <div>
+                                @if (!isEmptyContent)
+                                {
+                                    <p class="card-text @contentStyle">@content</p>
+                                }
+                                else
+                                {
+                                    <p class="card-text fst-italic text-black-50 @contentStyle">No Content</p>
+                                }
+                            </div>
+                            <div class="mt-3 d-flex align-items-center flex-wrap">
+                                <span class="badge bg-dark me-3" style="font-size: .85rem;">Tags:</span>
+                                @foreach (var tag in article.Tags!)
+                                {
+                                    <span class="badge bg-secondary me-1">@tag</span>
+                                }
+                            </div>
+                        </div>
+                    </a>
+                </div>
             </div>
         }
     </div>
