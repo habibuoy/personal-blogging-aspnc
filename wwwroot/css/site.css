@@ -42,30 +42,6 @@ body {
   margin-top: 1rem;
 }
 
-.article-details-container {
-  background: #fff;
-  border-radius: 10px;
-  padding: 16px 16px 16px;
-  box-shadow: 0 0 30px rgba(0,0,0,0.06);
-}
-
-.article-details-container .article-dates {
-  display: flex;
-  flex-grow: 1;
-  justify-content: space-between;
-  margin: 0 2;
-}
-
-.article-details-container .article-dates p {
-  font-weight: 500;
-}
-
-.article-details-container .buttons {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-}
-
 .input-field-item {
   background: #fff;
   border-radius: 10px;
