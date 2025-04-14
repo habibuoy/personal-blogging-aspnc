@@ -3,7 +3,6 @@
 @{
     ViewData["Title"] = "Home";
     const int ContentMaxShownCharacterCount = 300;
-    const string DisabledArticleDetailLinkStyle = "pointer-events: none;";
 }
 
 <div class="container" style="max-width: 50vw;">
@@ -59,7 +58,7 @@
 
             <div class="col-12">
                 <div class="card mb-3 shadow-sm h-100">
-                    <a asp-action="Details" asp-route-id="@article.Id" style="@(isLongContent ? string.Empty : DisabledArticleDetailLinkStyle)" class="disabled text-decoration-none text-dark">
+                    <a asp-action="Details" asp-route-id="@article.Id" class="disabled text-decoration-none text-dark">
                         <div class="card-body">
                             <div class="d-flex justify-content-between flex-wrap align-items-center mb-2">
                                 <div>
