@@ -14,11 +14,12 @@ public class HomeController : Controller
     private const int MaximumTagCount = 5;
     private const string NoneTags = "None";
 
+    private readonly Tag NoneTagObject = new() { Name = "None" };
     private readonly ILogger<HomeController> logger;
     private readonly ApplicationDbContext context;
 
-    private static readonly string[] SortByOptions = {"Title", "Published Date", "Last Update"};
-    private static readonly string[] SortOrderOptions = {"Asc", "Desc"};
+    private static readonly string[] SortByOptions = { "Title", "Published Date", "Last Update" };
+    private static readonly string[] SortOrderOptions = { "Asc", "Desc" };
 
     private static readonly Dictionary<string, Expression<Func<Article, object>>> SorterExpressions = new()
     {
@@ -38,24 +39,23 @@ public class HomeController : Controller
     {
         return RedirectToAction(nameof(Index));
     }
-    
+
     [HttpGet("index")]
     public async Task<IActionResult> Index(string? search, string[]? tags, string? sortBy, string? sortOrder)
     {
-        var articles = from article in context.Articles select article;
-        var tagsArray = articles.SelectMany(article => article.Tags!);
+        var articles = context.Articles.Include(a => a.Tags).AsQueryable();
 
         if (!string.IsNullOrEmpty(search))
         {
             articles = articles.Where(article => article.Title.ToUpper().Contains(search.ToUpper()));
         }
 
-        if (tags != null 
+        if (tags != null
             && tags.Length > 1
             || (tags!.Length == 1
                 && tags[0] != NoneTags))
         {
-            articles = articles.Where(article => article.Tags!.Intersect(tags).Count() > 0);
+            articles = articles.Where(article => article.Tags!.Any(tag => tags.Contains(tag.Name)));
         }
         else if (tags != null
                  && tags.Length == 0)
@@ -77,14 +77,16 @@ public class HomeController : Controller
             }
         }
 
-        var tagsList = await tagsArray.Distinct().ToListAsync();
-        tagsList.Insert(0, NoneTags);
+        var tagsOptionList = await context.Tags.ToListAsync();
+        tagsOptionList.Insert(0, NoneTagObject);
+
+        var tagStrings = tagsOptionList.Select(tag => tag.Name);
 
         var result = new ArticleListViewModel()
         {
             Articles = await articles.ToListAsync(),
             Search = search,
-            TagsOptions = new(tagsList),
+            TagsOptions = new(tagStrings),
             Tags = tags,
             SortByOptions = new(SortByOptions),
             SortBy = sortBy,
@@ -109,7 +111,19 @@ public class HomeController : Controller
             try
             {
                 article.PublishedDate = article.LastModifiedDate = DateTime.Now;
+
+                var tagNames = article.Tags!.Select(t => t.Name).Distinct().ToList();
+
+                var existingTags = await context.Tags
+                    .Where(t => tagNames.Contains(t.Name))
+                    .ToListAsync();
+
+                var newTagNames = tagNames.Except(existingTags.Select(t => t.Name)).ToList();
+                var newTags = newTagNames.Select(name => new Tag { Name = name }).ToList();
+
+                article.Tags = existingTags.Concat(newTags).ToList();
                 article.EnsureMaximumTagsCount(MaximumTagCount);
+
                 context.Add(article);
                 await context.SaveChangesAsync();
             }
@@ -132,7 +146,9 @@ public class HomeController : Controller
             return BadRequest();
         }
 
-        var article = await context.Articles.FindAsync(id);
+        var article = await context.Articles
+            .Include(a => a.Tags)
+            .FirstOrDefaultAsync(a => a.Id == id);
 
         if (article == null)
         {
@@ -151,7 +167,9 @@ public class HomeController : Controller
             return BadRequest();
         }
 
-        var article = await context.Articles.FindAsync(id);
+        var article = await context.Articles
+            .Include(a => a.Tags)
+            .FirstOrDefaultAsync(a => a.Id == id);
 
         if (article == null)
         {
@@ -170,8 +188,8 @@ public class HomeController : Controller
             return BadRequest();
         }
 
-        var (exists, existing) = ArticleExists(id.Value);
-        
+        var (exists, existing) = await ArticleExists(id.Value);
+
         if (id != article.Id
             || !exists)
         {
@@ -188,12 +206,29 @@ public class HomeController : Controller
                 existing!.AuthorName = article.AuthorName;
                 existing!.Title = article.Title;
                 existing!.Content = article.Content;
-                existing!.Tags = article.Tags;
                 existing!.LastModifiedDate = DateTime.Now;
 
-                existing.EnsureMaximumTagsCount(MaximumTagCount);
+                var tagNames = article.Tags!.Select(t => t.Name).Distinct().ToList();
 
+                var existingTags = await context.Tags
+                    .Where(t => tagNames.Contains(t.Name))
+                    .ToListAsync();
+
+                var newTagNames = tagNames.Except(existingTags.Select(t => t.Name)).ToList();
+                var newTags = newTagNames.Select(name => new Tag { Name = name }).ToList();
+
+                var finalTags = existingTags.Concat(newTags).ToList();
+
+                existing.Tags!.Clear();
+                foreach (var tag in finalTags)
+                {
+                    existing.Tags.Add(tag);
+                }
+
+                existing.EnsureMaximumTagsCount(MaximumTagCount);
                 await context.SaveChangesAsync();
+
+                await UpdateTags();
             }
             catch (DBConcurrencyException e)
             {
@@ -216,8 +251,8 @@ public class HomeController : Controller
             return BadRequest();
         }
 
-        var (exists, existing) = ArticleExists(id.Value);
-        
+        var (exists, existing) = await ArticleExists(id.Value);
+
         if (!exists)
         {
             logger.LogInformation($"{nameof(Delete)}: Article id {id} not found");
@@ -228,6 +263,8 @@ public class HomeController : Controller
         {
             context.Articles.Remove(existing!);
             await context.SaveChangesAsync();
+
+            await UpdateTags();
         }
         catch (DBConcurrencyException e)
         {
@@ -245,9 +282,24 @@ public class HomeController : Controller
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 
-    private (bool exists, Article? article) ArticleExists(int id)
+    private async Task<(bool exists, Article? article)> ArticleExists(int id)
     {
-        var article = context.Articles.Find(id);
+        var article = await context.Articles
+            .Include(a => a.Tags)
+            .FirstOrDefaultAsync(a => a.Id == id);
         return (article != null, article);
+    }
+
+    private async Task UpdateTags()
+    {
+        var unusedTags = await context.Tags
+            .Where(t => !t.Articles.Any())
+            .ToListAsync();
+
+        if (unusedTags.Count != 0)
+        {
+            context.Tags.RemoveRange(unusedTags);
+            await context.SaveChangesAsync();
+        }
     }
 }
