@@ -4,48 +4,54 @@
     ViewData["Title"] = "Edit";
 }
 
-<div class="row">
-    <div class="col" style="max-width: 60%; margin: auto;">
-        <h1>Edit</h1>
+<div class="container" style="max-width: 50vw;">
+    <div class="text-center mb-4">
+        <h1 class="display-4">Edit Article</h1>
         <h4>@Model.Title</h4>
-        <hr />
-        <form asp-action="Edit" class="form-parent">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    </div>
+
+    <div class="card shadow-sm p-4 mb-4">
+        <form asp-action="Edit" class="row g-3 justify-content-center">
+            <div asp-validation-summary="ModelOnly" class="text-danger col-12"></div>
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <div class="input-field-item">
-                    <label asp-for="AuthorName" class="control-label"></label>
-                    <input asp-for="AuthorName" class="form-control" />
-                    <span asp-validation-for="AuthorName" class="text-danger"></span>
-                </div>
+
+            <div class="col-12 col-md-6 col-lg-6">
+                <label asp-for="AuthorName" class="form-label"></label>
+                <input asp-for="AuthorName" class="form-control form-control-lg shadow-sm" />
+                <span asp-validation-for="AuthorName" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <div class="input-field-item">
-                    <label asp-for="Title" class="control-label"></label>
-                    <input asp-for="Title" class="form-control" />
-                    <span asp-validation-for="Title" class="text-danger"></span>
-                </div>
+
+            <div class="col-12 col-md-6 col-lg-6">
+                <label asp-for="Title" class="form-label"></label>
+                <input asp-for="Title" class="form-control form-control-lg shadow-sm" />
+                <span asp-validation-for="Title" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <div class="input-field-item">
-                    <label asp-for="Content" class="control-label"></label>
-                    <input asp-for="Content" class="form-control" />
-                    <span asp-validation-for="Content" class="text-danger"></span>
-                </div>
+
+            <div class="col-12">
+                <label asp-for="Content" class="form-label"></label>
+                <textarea asp-for="Content" class="form-control shadow-sm" rows="5"></textarea>
+                <span asp-validation-for="Content" class="text-danger"></span>
             </div>
-            <div class="form-group">
+
+            <div class="col-12">
                 @await Html.PartialAsync("_TagsInput", Model, ViewData)
             </div>
-            <div class="form-group">
-                <div class="input-field-item submit">
-                    <input type="submit" value="Save" class="btn btn-primary" />
-                    <a asp-action="Details" asp-route-id="@Model?.Id" class="btn btn-secondary">Back to details</a>
-                    <a asp-action="Index" class="btn btn-secondary"/>Back To List</a>
-                </div>
+
+            <div class="col-12 d-flex flex-wrap justify-content-center gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Save
+                </button>
+                <a asp-action="Details" asp-route-id="@Model?.Id" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Details
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-list-ul"></i> Back To List
+                </a>
             </div>
         </form>
     </div>
 </div>
+
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

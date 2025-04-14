@@ -15,12 +15,17 @@ function updateCount() {
     const maxReached = remainingCount <= 0;
     inputGuide.innerText = maxReached ? `Maximum Tags` : `Press enter or comma after each tag (${remainingCount} tag${remainingCount > 1 ? "s" : ""} remaining).`;
     input.disabled = maxReached;
+    input.placeholder = maxReached ? "" : "Input tag here";
 }
 
 function updateTags() {
     list.querySelectorAll("#tags-item").forEach(li => li.remove());
     tags.slice().reverse().forEach(tag => {
-        let liTag = `<li id="tags-item">${tag} <i class="bi bi-x" onclick="remove(this, '${tag}')"></i></li>`;
+        let liTag = 
+            `<li id="tags-item" class="badge bg-secondary d-inline-flex align-items-center gap-1 me-1 mb-1">
+                ${tag}
+                <i class="bi bi-x" role="button" onclick="remove(this, '${tag}')"></i>
+            </li>`;
         list.insertAdjacentHTML("afterbegin", liTag);
     });
     updateCount();
@@ -77,7 +82,7 @@ input.addEventListener("keydown", function(event) {
     }
 });
 
-const removeAllTagsBtn = document.querySelector("#tags-input-details button");
+const removeAllTagsBtn = document.querySelector("#tags-remove-all");
 
 removeAllTagsBtn.addEventListener("click", () =>{
     tags.length = 0;
