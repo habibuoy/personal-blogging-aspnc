@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PersonalBlogging.Data;
 
@@ -11,9 +12,11 @@ using PersonalBlogging.Data;
 namespace PersonalBlogging.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250414101205_RenameArticleTags")]
+    partial class RenameArticleTags
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace PersonalBlogging.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("ArticleTag", b =>
-                {
-                    b.Property<int>("ArticlesId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TagsName")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("ArticlesId", "TagsName");
-
-                    b.HasIndex("TagsName");
-
-                    b.ToTable("ArticleTag");
-                });
 
             modelBuilder.Entity("PersonalBlogging.Models.Article", b =>
                 {
@@ -58,6 +46,10 @@ namespace PersonalBlogging.Migrations
                     b.Property<DateTime?>("PublishedDate")
                         .HasColumnType("datetime2");
 
+                    b.PrimitiveCollection<string>("Tags")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("OldTags");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -65,31 +57,6 @@ namespace PersonalBlogging.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Articles");
-                });
-
-            modelBuilder.Entity("PersonalBlogging.Models.Tag", b =>
-                {
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Name");
-
-                    b.ToTable("Tags", (string)null);
-                });
-
-            modelBuilder.Entity("ArticleTag", b =>
-                {
-                    b.HasOne("PersonalBlogging.Models.Article", null)
-                        .WithMany()
-                        .HasForeignKey("ArticlesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PersonalBlogging.Models.Tag", null)
-                        .WithMany()
-                        .HasForeignKey("TagsName")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

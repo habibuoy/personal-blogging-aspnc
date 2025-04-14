@@ -14,30 +14,37 @@ public class Article
     [DisplayName("Author Name")]
     public string AuthorName { get; set; } = string.Empty;
     public string? Content { get; set; }
-    public string[]? Tags { get; set; }
+    public ICollection<Tag>? Tags { get; set; }
 
     [NotMapped]
     public string TagsString
     {
         get
         {
-            return Tags != null ? string.Join(", ", Tags) : string.Empty;
+            return Tags != null ? string.Join(", ", Tags.Select(tag => tag.Name)) : string.Empty;
         }
 
         set
         {
-            Tags = value?.Split(",").Select(tag => tag.Trim()).ToArray();
+            if (string.IsNullOrEmpty(value))
+            {
+                Tags = new List<Tag>();
+                return;
+            }
+
+            Tags = value.Split(", ")
+                .Distinct()
+                .Select(tagName => new Tag { Name = tagName })
+                .ToList();
         }
     }
 
     public void EnsureMaximumTagsCount(int count)
     {
         if (Tags != null
-            && Tags.Length > count)
+            && Tags.Count > count)
         {
-            var tags = Tags;
-            Array.Resize(ref tags, count);
-            Tags = tags;
+            Tags = Tags.Take(count).ToList();
         }
     }
 }

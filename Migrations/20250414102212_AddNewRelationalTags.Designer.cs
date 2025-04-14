@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PersonalBlogging.Data;
 
@@ -11,9 +12,11 @@ using PersonalBlogging.Data;
 namespace PersonalBlogging.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250414102212_AddNewRelationalTags")]
+    partial class AddNewRelationalTags
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace PersonalBlogging.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("ArticleTag", b =>
-                {
-                    b.Property<int>("ArticlesId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TagsName")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("ArticlesId", "TagsName");
-
-                    b.HasIndex("TagsName");
-
-                    b.ToTable("ArticleTag");
-                });
 
             modelBuilder.Entity("PersonalBlogging.Models.Article", b =>
                 {
@@ -55,6 +43,9 @@ namespace PersonalBlogging.Migrations
                     b.Property<DateTime?>("LastModifiedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("OldTags")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("PublishedDate")
                         .HasColumnType("datetime2");
 
@@ -72,24 +63,26 @@ namespace PersonalBlogging.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int?>("ArticleId")
+                        .HasColumnType("int");
+
                     b.HasKey("Name");
 
-                    b.ToTable("Tags", (string)null);
+                    b.HasIndex("ArticleId");
+
+                    b.ToTable("Tag");
                 });
 
-            modelBuilder.Entity("ArticleTag", b =>
+            modelBuilder.Entity("PersonalBlogging.Models.Tag", b =>
                 {
                     b.HasOne("PersonalBlogging.Models.Article", null)
-                        .WithMany()
-                        .HasForeignKey("ArticlesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("Tags")
+                        .HasForeignKey("ArticleId");
+                });
 
-                    b.HasOne("PersonalBlogging.Models.Tag", null)
-                        .WithMany()
-                        .HasForeignKey("TagsName")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            modelBuilder.Entity("PersonalBlogging.Models.Article", b =>
+                {
+                    b.Navigation("Tags");
                 });
 #pragma warning restore 612, 618
         }

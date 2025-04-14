@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PersonalBlogging.Data;
 
@@ -11,9 +12,11 @@ using PersonalBlogging.Data;
 namespace PersonalBlogging.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250414104426_RemoveOldTagsColumn")]
+    partial class RemoveOldTagsColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -74,7 +77,7 @@ namespace PersonalBlogging.Migrations
 
                     b.HasKey("Name");
 
-                    b.ToTable("Tags", (string)null);
+                    b.ToTable("Tag");
                 });
 
             modelBuilder.Entity("ArticleTag", b =>
