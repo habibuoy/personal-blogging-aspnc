@@ -22,7 +22,7 @@ function updateTags() {
     list.querySelectorAll("#tags-item").forEach(li => li.remove());
     tags.slice().reverse().forEach(tag => {
         let liTag = 
-            `<li id="tags-item" class="badge bg-secondary d-inline-flex align-items-center gap-1 me-1 mb-1">
+            `<li id="tags-item" class="badge bg-secondary d-inline-flex align-items-center gap-1 me-1 mb-1" style="font-size: 0.85rem">
                 ${tag}
                 <i class="bi bi-x" role="button" onclick="remove(this, '${tag}')"></i>
             </li>`;
