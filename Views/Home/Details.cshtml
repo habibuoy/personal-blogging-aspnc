@@ -1,4 +1,4 @@
-@model PersonalBlogging.Models.Article
+@model PersonalBlogging.Models.Dto.ArticleDto
 
 @{
     ViewData["Title"] = "Details";
@@ -45,7 +45,7 @@
                 <div class="d-flex flex-wrap gap-2">
                     @foreach (var tag in Model.Tags!)
                     {
-                        <span class="badge bg-secondary" style="overflow-wrap: anywhere;">@tag.Name</span>
+                        <span class="badge bg-secondary" style="overflow-wrap: anywhere;">@tag</span>
                     }
                 </div>
             </div>
@@ -71,7 +71,7 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Delete Article</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">

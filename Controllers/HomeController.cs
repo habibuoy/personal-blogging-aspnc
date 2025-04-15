@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PersonalBlogging.Data;
 using PersonalBlogging.Models;
+using PersonalBlogging.Models.Dto;
 
 namespace PersonalBlogging.Controllers;
 
@@ -84,7 +85,7 @@ public class HomeController : Controller
 
         var result = new ArticleListViewModel()
         {
-            Articles = await articles.ToListAsync(),
+            Articles = await articles.Select(article => article.ToDto()).ToListAsync(),
             Search = search,
             TagsOptions = new(tagStrings),
             Tags = tags,
@@ -156,7 +157,7 @@ public class HomeController : Controller
             return NotFound();
         }
 
-        return View(article);
+        return View(article.ToDto());
     }
 
     [HttpGet("edit/{id}")]
