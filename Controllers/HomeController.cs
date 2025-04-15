@@ -101,17 +101,17 @@ public class HomeController : Controller
     [HttpGet("create")]
     public IActionResult Create()
     {
-        return View(new Article());
+        return View(new ArticleCreateDto());
     }
 
     [HttpPost("create")]
-    public async Task<IActionResult> Create([Bind("AuthorName, Title, Content, TagsString")] Article article)
+    public async Task<IActionResult> Create([Bind("AuthorName, Title, Content, TagsString")] ArticleCreateDto input)
     {
         if (ModelState.IsValid)
         {
             try
             {
-                article.PublishedDate = article.LastModifiedDate = DateTime.Now;
+                var article = input.ToArticle();
 
                 var tagNames = article.Tags!.Select(t => t.Name).Distinct().ToList();
 
@@ -136,7 +136,7 @@ public class HomeController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        return View(article);
+        return View(input);
     }
 
     [HttpGet("details/{id}")]
@@ -178,11 +178,11 @@ public class HomeController : Controller
             return NotFound();
         }
 
-        return View(article);
+        return View(article.ToEditDto());
     }
 
     [HttpPost("edit/{id}")]
-    public async Task<IActionResult> Edit(int? id, [Bind("Id, AuthorName, Title, Content, TagsString")] Article article)
+    public async Task<IActionResult> Edit(int? id, [Bind("Id, AuthorName, Title, Content, TagsString")] ArticleEditDto input)
     {
         if (id == null)
         {
@@ -191,7 +191,7 @@ public class HomeController : Controller
 
         var (exists, existing) = await ArticleExists(id.Value);
 
-        if (id != article.Id
+        if (id != input.Id
             || !exists)
         {
             logger.LogInformation($"{nameof(Edit)}: Article id {id} not found");
@@ -202,6 +202,7 @@ public class HomeController : Controller
         {
             try
             {
+                var article = input.ToArticle();
                 // use the load and update pattern instead of context.Update()
                 // because that method is causing the Already Tracked exception
                 existing!.AuthorName = article.AuthorName;
@@ -241,7 +242,7 @@ public class HomeController : Controller
         }
 
         logger.LogInformation($"{nameof(Edit)}: Invalid Article Model");
-        return View(article);
+        return View(input);
     }
 
     [HttpPost("delete/{id}")]
