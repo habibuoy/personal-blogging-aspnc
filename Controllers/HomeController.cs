@@ -16,6 +16,7 @@ public class HomeController : Controller
     private const int MaximumTagCount = 5;
     private const string NoneTags = "None";
     private const string AllTagsCacheKey = "AllTags";
+    private const string ArticleCacheKeyPrefix = "Article:";
 
     private readonly Tag NoneTagObject = new() { Name = "None" };
     private readonly ILogger<HomeController> logger;
@@ -160,9 +161,16 @@ public class HomeController : Controller
             return BadRequest();
         }
 
-        var article = await context.Articles
-            .Include(a => a.Tags)
-            .FirstOrDefaultAsync(a => a.Id == id);
+        var article = await cache.GetOrSetAsync<ArticleDto>($"{ArticleCacheKeyPrefix}{id}",
+            async (ctx, ct) =>
+            {
+                var article = await context.Articles
+                .Include(a => a.Tags)
+                .FirstOrDefaultAsync(a => a.Id == id, cancellationToken: ct);
+
+                return article?.ToDto();
+            },
+            options => options.SetDuration(TimeSpan.FromSeconds(10)));
 
         if (article == null)
         {
@@ -170,7 +178,7 @@ public class HomeController : Controller
             return NotFound();
         }
 
-        return View(article.ToDto());
+        return View(article);
     }
 
     [HttpGet("edit/{id}")]
@@ -242,6 +250,8 @@ public class HomeController : Controller
 
                 existing.EnsureMaximumTagsCount(MaximumTagCount);
                 await context.SaveChangesAsync();
+
+                await cache.RemoveAsync($"{ArticleCacheKeyPrefix}{id}");
 
                 await UpdateTags(newTagNames);
             }
