@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using PersonalBlogging.Data;
 using PersonalBlogging.Models;
 using PersonalBlogging.Models.Dto;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace PersonalBlogging.Controllers;
 
@@ -14,10 +15,12 @@ public class HomeController : Controller
 {
     private const int MaximumTagCount = 5;
     private const string NoneTags = "None";
+    private const string AllTagsCacheKey = "AllTags";
 
     private readonly Tag NoneTagObject = new() { Name = "None" };
     private readonly ILogger<HomeController> logger;
     private readonly ApplicationDbContext context;
+    private readonly IFusionCache cache;
 
     private static readonly string[] SortByOptions = { "Title", "Published Date", "Last Update" };
     private static readonly string[] SortOrderOptions = { "Asc", "Desc" };
@@ -29,10 +32,11 @@ public class HomeController : Controller
         { SortByOptions[2], article => article.LastModifiedDate!},
     };
 
-    public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
+    public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, IFusionCache cache)
     {
         this.logger = logger;
         this.context = context;
+        this.cache = cache;
     }
 
     [HttpGet("")]
@@ -78,10 +82,18 @@ public class HomeController : Controller
             }
         }
 
-        var tagsOptionList = await context.Tags.ToListAsync();
-        tagsOptionList.Insert(0, NoneTagObject);
+        var tagsOptionList = await cache.GetOrSetAsync<List<Tag>>(
+            AllTagsCacheKey,
+            async (ctx, ct) => await context.Tags.ToListAsync(cancellationToken: ct));
 
-        var tagStrings = tagsOptionList.Select(tag => tag.Name);
+        if (tagsOptionList != null
+            && tagsOptionList.Count > 0
+            && tagsOptionList[0].Name != NoneTags)
+        {
+            tagsOptionList.Insert(0, NoneTagObject);
+        }
+
+        var tagStrings = tagsOptionList!.Select(tag => tag.Name);
 
         var result = new ArticleListViewModel()
         {
@@ -127,6 +139,7 @@ public class HomeController : Controller
 
                 context.Add(article);
                 await context.SaveChangesAsync();
+                await UpdateTags(newTagNames);
             }
             catch (DBConcurrencyException e)
             {
@@ -230,7 +243,7 @@ public class HomeController : Controller
                 existing.EnsureMaximumTagsCount(MaximumTagCount);
                 await context.SaveChangesAsync();
 
-                await UpdateTags();
+                await UpdateTags(newTagNames);
             }
             catch (DBConcurrencyException e)
             {
@@ -266,7 +279,7 @@ public class HomeController : Controller
             context.Articles.Remove(existing!);
             await context.SaveChangesAsync();
 
-            await UpdateTags();
+            await UpdateTags(null);
         }
         catch (DBConcurrencyException e)
         {
@@ -292,16 +305,28 @@ public class HomeController : Controller
         return (article != null, article);
     }
 
-    private async Task UpdateTags()
+    private async Task UpdateTags(IEnumerable<string>? newTags)
     {
         var unusedTags = await context.Tags
             .Where(t => !t.Articles.Any())
             .ToListAsync();
 
-        if (unusedTags.Count != 0)
+        bool tagsChanged = false;
+
+        if (unusedTags.Count > 0
+            || newTags != null && newTags.Any())
         {
-            context.Tags.RemoveRange(unusedTags);
+            if (unusedTags.Count > 0)
+            {
+                context.Tags.RemoveRange(unusedTags);
+            }
+            tagsChanged = true;
+        }
+
+        if (tagsChanged)
+        {
             await context.SaveChangesAsync();
+            await cache.RemoveAsync(AllTagsCacheKey);
         }
     }
 }
