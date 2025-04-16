@@ -6,6 +6,7 @@ public class ArticleCreateDto
     public string Title { get; set; } = string.Empty;
     public string? Content { get; set; }
     public string? TagsString { get; set; }
+    public int MaxTagCount { get; set; }
 }
 
 public static class ArticleCreateDtoExtensions

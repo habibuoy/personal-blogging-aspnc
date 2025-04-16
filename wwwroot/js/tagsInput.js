@@ -2,8 +2,7 @@ const list = document.querySelector("#tags-list");
 const hiddenInput = document.querySelector("#tags-hidden");
 const input = document.querySelector("#tags-input");
 const inputGuide = document.querySelector("#tags-input-guide");
-
-const maxTags = 5;
+const maxTags = document.querySelector("#max-tags-count").value;
 
 let tags = hiddenInput.value ? hiddenInput.value.split(', ') : [];
 

@@ -64,7 +64,7 @@ public class HomeController : Controller
             articles = articles.Where(article => article.Tags!.Any(tag => tags.Contains(tag.Name)));
         }
         else if (tags != null
-                 && tags.Length == 0)
+            && tags.Length == 0)
         {
             tags = [NoneTags];
         }
@@ -89,7 +89,7 @@ public class HomeController : Controller
 
         if (tagsOptionList != null
             && tagsOptionList.Count > 0
-            && tagsOptionList[0].Name != NoneTags)
+            && !tagsOptionList.Any(tag => tag.Name == NoneTags))
         {
             tagsOptionList.Insert(0, NoneTagObject);
         }
@@ -114,7 +114,10 @@ public class HomeController : Controller
     [HttpGet("create")]
     public IActionResult Create()
     {
-        return View(new ArticleCreateDto());
+        return View(new ArticleCreateDto()
+        {
+            MaxTagCount = MaximumTagCount
+        });
     }
 
     [HttpPost("create")]
